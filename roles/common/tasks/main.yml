@@ -1,0 +1,25 @@
+---
+- name: Create directories
+  file: path={{ item.path }} state=directory mode={{ item.mode }}
+  with_items:
+          - { path: "{{ hadoop_install_dir }}", mode: '0700' }
+
+
+- name: Copying provisioning scripts
+  template: src={{ item.src }} dest="{{ hadoop_install_dir}}/{{ item.dest }}" mode=0744
+  with_items:
+          - { src: 'hadoop-config.sh.j2', dest: 'hadoop-config.sh' }
+          - { src: 'provision-hadoop.sh.j2', dest: 'provision-hadoop.sh' }
+          - { src: 'provision-master.sh.j2', dest: 'provision-master.sh' }
+          - { src: 'provision-slave.sh.j2', dest: 'provision-slave.sh' }
+
+- name: Copying configuration/archive/control scripts
+  copy: src={{ item.file }} dest="{{ hadoop_install_dir }}/{{ item.file }}"  mode={{ item.mode }}
+  with_items:
+          - { file: 'core-site.xml', mode: 0644 }
+          - { file: 'mapred-site.xml', mode: 0644  }
+          - { file: 'test-pi-yarn.sh', mode: 0744  }
+          - { file: 'yarn-site.xml', mode: 0644  }
+          - { file: 'hadoop-2.6.0.tar.gz', mode: 0644  }
+          - { file: 'restart-hadoop-master-daemons.sh', mode: 0744  }
+          - { file: 'restart-hadoop-slave-daemons.sh', mode: 0744  }
