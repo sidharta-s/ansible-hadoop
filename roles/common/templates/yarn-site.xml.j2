@@ -37,16 +37,24 @@
   </property>  
 
   <property>
-    <name>yarn.nodemanager.docker-container-executor.exec-name</name>
-    <value>/usr/bin/docker</value>
+    <name>yarn.nodemanager.container-executor.class</name>
+    <value>{{ container_executor }}</value>
   </property>
 
-  <!--
   <property>
-    <name>yarn.nodemanager.container-executor.class</name>
-    <value>org.apache.hadoop.yarn.server.nodemanager.DockerContainerExecutor</value>
+      <name>yarn.nodemanager.linux-container-executor.resources-handler.class</name>
+      <value>org.apache.hadoop.yarn.server.nodemanager.util.CgroupsLCEResourcesHandler</value>
   </property>
-  -->
+  
+  <property>
+      <name>yarn.nodemanager.linux-container-executor.cgroups.mount</name>
+      <value>{{ cgroups_mount_enable }}</value>
+  </property>
+  
+  <property>
+      <name>yarn.nodemanager.linux-container-executor.cgroups.mount-path</name>
+      <value>{{ cgroups_mount_dir }}</value>
+  </property>
 
   <property>
     <name>yarn.log-aggregation-enable</name>

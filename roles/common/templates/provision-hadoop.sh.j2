@@ -19,15 +19,16 @@ then
   rm -fr ${HADOOP_HOME}
 fi
 
-echo "creating hadoop install dir: ${HADOOP_INSTALL_DIR} "
-mkdir -p ${HADOOP_INSTALL_DIR}
+echo "creating new hadoop home: "
+mkdir -p ${HADOOP_HOME}
 
-echo "extracting hadoop installation ... "
-tar -zxvf ${HADOOP_ARCHIVE} -C ${HADOOP_INSTALL_DIR}
+echo "extracting hadoop archive ... "
+tar -zxvf ${HADOOP_ARCHIVE} -C ${HADOOP_HOME} --strip-components=1
 
 echo "creating hadoop environment script... "
 cat <<EOF > ${ENV_CONFIG}
 export JAVA_HOME=$JAVA_HOME
+export HADOOP_HOME=${HADOOP_HOME}
 export HADOOP_MAPRED_HOME=${HADOOP_HOME}
 export HADOOP_COMMON_HOME=${HADOOP_HOME}
 export HADOOP_HDFS_HOME=${HADOOP_HOME}
@@ -56,6 +57,9 @@ else
   cp ${HADOOP_INSTALL_DIR}/yarn-default.xml ${YARN_DEFAULT}
 fi
 
+echo "setting up container-executor.cfg .. "
+cp ${HADOOP_INSTALL_DIR}/container-executor.cfg ${CONTAINER_EXECUTOR_CFG}
+
 echo "setting up yarn-site.xml .. "
 cp ${HADOOP_INSTALL_DIR}/yarn-site.xml ${YARN_SITE}
 sed -i "s;__MASTER_IP__;${MASTER_IP};g" ${YARN_SITE}
@@ -66,6 +70,10 @@ cp ${HADOOP_INSTALL_DIR}/mapred-site.xml ${MAPRED_SITE}
 echo "setting up slaves file .. "
 echo "slaves list : ${SLAVE_IPS}"
 echo ${SLAVE_IPS} | sed "s/,/\n/g" > ${SLAVES}
+
+echo "fixing permissions ... "
+chown -R root:root ${HADOOP_HOME}
+chmod 6050 ${HADOOP_HOME}/bin/container-executor 
 
 echo "done installing hadoop environment"
 
